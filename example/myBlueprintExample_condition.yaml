@@ -1,0 +1,4 @@
+- condition: state
+  entity_id: sun.sun
+  state: "below_horizon"
+

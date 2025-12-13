@@ -1,0 +1,42 @@
+# Temporary files
+*.tmp
+tmp*
+*.log
+
+# VS Code / Cursor
+.vscode/
+.cursor/
+*.code-workspace
+
+# Node modules (if any)
+node_modules/
+npm-debug.log*
+
+# OS files
+.DS_Store
+Thumbs.db
+*.swp
+*.swo
+*~
+
+# Build artifacts
+*.vsix
+!tg-merge-blueprint-*.vsix
+
+# Example output files (keep input files)
+example/*.yaml
+!example/*_.yaml
+!example/*_*.yaml
+!example/*.package
+!example/*.jinja
+
+# Temporary extension build directory
+temp_extension/
+
+# Local publishing guide (not for repository)
+PUBLISH.md
+PUBLICATION_STEPS.md
+publish.sh
+publish_to_repos.sh
+setup_repo.sh
+

@@ -1,0 +1,65 @@
+{
+  "name": "tg-merge-blueprint",
+  "displayName": "tgBlueprintMerger - Home Assistant Blueprint Merger",
+  "description": "Save and merge Home Assistant Blueprint files using tgBlueprintMerger. Enables modular development of complex Home Assistant automations by splitting blueprints into reusable components.",
+  "version": "1.0.0",
+  "publisher": "tg",
+  "engines": {
+    "vscode": "^1.80.0"
+  },
+  "categories": [
+    "Other"
+  ],
+  "activationEvents": [
+    "onStartupFinished"
+  ],
+  "main": "./extension.js",
+  "contributes": {
+    "commands": [
+      {
+        "command": "tgMerge.saveAndMerge",
+        "title": "Save & Merge Home Assistant Blueprint",
+        "icon": "$(merge)"
+      }
+    ],
+    "menus": {
+      "editor/title": [
+        {
+          "command": "tgMerge.saveAndMerge",
+          "when": "resourceExtname == '.yaml' && resourceFileName =~ /_.*\\.yaml$/",
+          "group": "navigation",
+          "alt": "tgMerge.saveAndMerge"
+        }
+      ],
+      "editor/title/context": [
+        {
+          "command": "tgMerge.saveAndMerge",
+          "when": "resourceExtname == '.yaml' && resourceFileName =~ /_.*\\.yaml$/",
+          "group": "navigation"
+        }
+      ],
+      "commandPalette": [
+        {
+          "command": "tgMerge.saveAndMerge",
+          "when": "resourceExtname == '.yaml'"
+        }
+      ]
+    },
+    "configuration": {
+      "title": "tgBlueprintMerger",
+      "properties": {
+        "tgBlueprintMerger.scriptPath": {
+          "type": "string",
+          "default": "",
+          "description": "Pfad zum tgBlueprintMerger_yaml_jinja.sh Script. Leer lassen für automatische Suche. Kann absolut oder relativ zum Workspace-Root sein.",
+          "scope": "resource"
+        }
+      }
+    }
+  },
+  "scripts": {
+    "vscode:prepublish": "echo 'No prepublish needed'"
+  }
+}
+
+

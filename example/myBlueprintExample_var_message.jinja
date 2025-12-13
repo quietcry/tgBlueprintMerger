@@ -1,0 +1,7 @@
+{%- if enable_debug -%}
+  {%- set debug_msg = "Debug: " ~ name ~ " wurde ausgeführt" -%}
+  {{- debug_msg -}}
+{%- else -%}
+  {{- name ~ " wurde erfolgreich ausgeführt" -}}
+{%- endif -%}
+
