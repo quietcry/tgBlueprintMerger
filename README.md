@@ -14,10 +14,12 @@ Ein modulares Build-System für Home Assistant Blueprints, das es ermöglicht, k
 - [Marker-Syntax](#marker-syntax)
 - [Verwendung](#verwendung)
 - [Beispiele](#beispiele)
-- [Hooks](#hooks)
-- [Architektur](#architektur)
-- [Troubleshooting](#troubleshooting)
-- [Entwicklung](#entwicklung)
+- [Internationalisierung (i18n)](#-internationalisierung-i18n)
+- [Doc-Tag-Filterung](#-doc-tag-filterung)
+- [Hooks](#-hooks)
+- [Architektur](#️-architektur)
+- [Troubleshooting](#-troubleshooting)
+- [Entwicklung](#-entwicklung)
 
 ## 🎯 Überblick
 
@@ -42,6 +44,8 @@ Das System fügt diese Module automatisch zu einer finalen, Home Assistant-kompa
 - ✅ **YAML & Jinja**: Unterstützung für beide Dateiformate
 - ✅ **Conditional Merges**: Fallback-Mechanismus mit `TRUE-tgMerger` Markern
 - ✅ **Externe Dateien**: Einbindung von Dateien aus anderen Verzeichnissen (z.B. gemeinsame Jinja-Makros, Code-Snippets)
+- ✅ **🌍 Internationalisierung (i18n)**: Automatische Übersetzung von Blueprints in mehrere Sprachen
+- ✅ **📝 Doc-Tag-Filterung**: Automatisches Entfernen von Dokumentationsblöcken (`#Doc-Start` / `#Doc-End`)
 
 ### VS Code/Cursor Integration
 - 🎨 **Toolbar-Button**: Direkter Zugriff über Editor-Toolbar
@@ -55,6 +59,9 @@ Das System fügt diese Module automatisch zu einer finalen, Home Assistant-kompa
 - 🔄 **Rekursive Verarbeitung**: Automatische Verarbeitung verschachtelter Merges
 - ⚠️ **Fehlerbehandlung**: Detaillierte Fehlermeldungen bei Problemen
 - 📁 **Pfad-Unterstützung**: Relative und absolute Pfade für externe Dateien
+- 🌍 **Internationalisierung (i18n)**: Automatische Übersetzung in mehrere Sprachen mit Marker-Syntax
+- 📝 **Doc-Tag-Filterung**: Automatisches Entfernen von Dokumentationsblöcken (`#Doc-Start` / `#Doc-End`)
+- 🧹 **Saubere Ausgabe**: Automatisches Entfernen führender Leerzeilen
 
 ## 🚀 Installation
 
@@ -77,21 +84,39 @@ cd /pfad/zu/ihrem/tgBlueprintMerger
 
 ### Schritt 2: VS Code Extension installieren
 
-**Hinweis**: Das Script `tgBlueprintMerger_yaml_jinja.sh` ist bereits in der Extension enthalten und wird automatisch ausführbar gemacht. Sie müssen es nicht separat installieren oder konfigurieren.
+**Wichtig**: Die Extension ist eine minimale Wrapper-Extension. Das Script `tgBlueprintMerger_yaml_jinja.sh` muss im Workspace-Root liegen.
 
-1. Installieren Sie die VSIX-Datei:
-   - `Ctrl+Shift+P` → "Extensions: Install from VSIX"
+1. Erstellen Sie die VSIX-Datei:
+   ```bash
+   cd /pfad/zu/tgBlueprintMerger
+   chmod +x create_vsix_minimal.sh
+   ./create_vsix_minimal.sh
+   ```
+
+2. Installieren Sie die VSIX-Datei:
+   - `Ctrl+Shift+P` → "Extensions: Install from VSIX..."
    - Wählen Sie die Datei `tg-merge-blueprint-1.0.0.vsix` aus dem Repository-Root
+
+### Schritt 3: Script im Workspace platzieren
+
+**Wichtig**: Das Script `tgBlueprintMerger_yaml_jinja.sh` muss im Workspace-Root liegen, damit die Extension es finden kann.
+
+1. Kopieren Sie das Script in Ihr Workspace-Root:
+   ```bash
+   cp /pfad/zu/tgBlueprintMerger/tgBlueprintMerger_yaml_jinja.sh /pfad/zu/ihrem/workspace/
+   ```
+
+2. Machen Sie das Script ausführbar:
+   ```bash
+   chmod +x /pfad/zu/ihrem/workspace/tgBlueprintMerger_yaml_jinja.sh
+   ```
 
 ### Schritt 4: Konfiguration (Optional)
 
-**Wichtig**: Das Script `tgBlueprintMerger_yaml_jinja.sh` ist bereits in der Extension enthalten und wird automatisch verwendet. Sie müssen es nicht separat installieren.
-
 Die Extension sucht das Script in folgender Reihenfolge:
-1. **Extension-Verzeichnis** (Standard) - Das Script wird automatisch ausführbar gemacht
-2. **Konfigurierter Pfad** (falls in Einstellungen gesetzt)
-3. **Workspace-Root**
-4. **Übergeordnete Verzeichnisse** (bis zu 10 Ebenen)
+1. **Konfigurierter Pfad** (falls in Einstellungen gesetzt)
+2. **Workspace-Root** (empfohlen)
+3. **Übergeordnete Verzeichnisse** (bis zu 10 Ebenen)
 
 Falls Sie einen benutzerdefinierten Pfad verwenden möchten:
 
@@ -677,6 +702,120 @@ variables:
 
 **Ergebnis**: Der Inline-Inhalt wird verwendet, nicht die Datei `production_config.yaml`.
 
+## 🌍 Internationalisierung (i18n)
+
+tgBlueprintMerger unterstützt die automatische Übersetzung von Blueprints in mehrere Sprachen.
+
+### Konfiguration
+
+Erstellen Sie eine `.package` Datei im Blueprint-Verzeichnis:
+
+```yaml
+LANG=[de,en,it]
+DEFAULT_LANG=de
+```
+
+- **LANG**: Liste der unterstützten Sprachen (ISO 639-1 Codes, z.B. `de`, `en`, `it`)
+- **DEFAULT_LANG**: Standard-Sprache (wird ohne Sprach-Suffix generiert)
+
+### i18n-Marker-Syntax
+
+Verwenden Sie `&i18n:ID:Fallback Text&` in Ihren Blueprint-Dateien:
+
+```yaml
+blueprint:
+  name: &i18n:10001:My Example Blueprint&
+  description: &i18n:10002:Ein Beispiel-Blueprint für tgBlueprintMerger&
+  domain: automation
+  input:
+    name:
+      name: &i18n:10003:Name&
+      description: &i18n:10004:Name der Automatisierung&
+```
+
+**Marker-Format:**
+- `&i18n:ID:Fallback Text&`
+- **ID**: Eindeutige Text-ID (Zahl, z.B. `10001`)
+- **Fallback Text**: Standard-Text, der verwendet wird, wenn keine Übersetzung gefunden wird
+
+### Übersetzungsdateien
+
+Erstellen Sie ein `translations/` Verzeichnis im Blueprint-Verzeichnis:
+
+```
+myBlueprint/
+├── myBlueprint_.yaml
+├── myBlueprint.package
+├── translations/
+│   ├── de.yaml    # Deutsche Übersetzungen
+│   ├── en.yaml    # Englische Übersetzungen
+│   └── it.yaml    # Italienische Übersetzungen
+```
+
+**Format der Übersetzungsdateien** (`translations/de.yaml`):
+```yaml
+# German translations
+10001: "Mein Beispiel-Blueprint"
+10002: "Ein Beispiel-Blueprint für tgBlueprintMerger"
+10003: "Name"
+10004: "Name der Automatisierung"
+```
+
+### Generierte Dateien
+
+Nach dem Merge werden sprachspezifische Dateien generiert:
+
+- **Standard-Sprache** (de): `myBlueprint.yaml` (ohne Suffix)
+- **Weitere Sprachen**: `myBlueprint_en.yaml`, `myBlueprint_it.yaml`
+
+### Übersetzungen in Jinja-Templates
+
+i18n-Marker funktionieren auch innerhalb von Jinja-Templates:
+
+```jinja
+{%- if enable_debug -%}
+  {%- set debug_msg = "Debug: " ~ name ~ " &i18n:10007:wurde ausgeführt&" -%}
+  {{- debug_msg -}}
+{%- else -%}
+  {{- name ~ " &i18n:10008:wurde erfolgreich ausgeführt&" -}}
+{%- endif -%}
+```
+
+### Zentrale Übersetzungsdatenbank
+
+Falls eine Übersetzung nicht im Projekt gefunden wird, wird eine zentrale Datenbank (`i18n_central_db.yaml`) im Repository-Root durchsucht. Gefundene Übersetzungen werden automatisch in das Projekt kopiert.
+
+### Fehlende Übersetzungen
+
+Fehlende Übersetzungen werden in `missing_text-id.txt` protokolliert:
+
+```
+10007|wurde ausgeführt
+10008|wurde erfolgreich ausgeführt
+```
+
+Format: `ID|Fallback Text`
+
+## 📝 Doc-Tag-Filterung
+
+Dokumentationsblöcke werden automatisch aus dem Output entfernt:
+
+**YAML-Doc-Tags:**
+```yaml
+#Doc-Start
+# Diese Dokumentation wird entfernt
+#Doc-End
+```
+
+**Jinja-Doc-Tags:**
+```jinja
+{#Doc-Start#}
+{# Diese Dokumentation wird entfernt #}
+{#Doc-End#}
+```
+
+Die Doc-Tags können auch in derselben Zeile wie anderer Text stehen - die gesamte Zeile wird entfernt.
+
 ## 🔧 Hooks
 
 Das System unterstützt Pre- und Post-Merge Hooks für erweiterte Funktionalität.
@@ -939,10 +1078,14 @@ Bei Fragen oder Problemen:
 ### Version 1.0.0
 - Initiale Version
 - Basis-Merge-Funktionalität
-- VS Code Extension
+- VS Code Extension (minimale Wrapper-Extension)
 - Unterstützung für YAML und Jinja
 - Conditional Merges
 - Hook-System
+- 🌍 **Internationalisierung (i18n)**: Automatische Übersetzung in mehrere Sprachen
+- 📝 **Doc-Tag-Filterung**: Automatisches Entfernen von Dokumentationsblöcken
+- 🔧 **Verbesserte Newline-Behandlung**: Module müssen nicht mehr mit Newline enden
+- 🧹 **Führende Leerzeilen entfernt**: Saubere Output-Dateien ohne führende Leerzeilen
 
 ---
 

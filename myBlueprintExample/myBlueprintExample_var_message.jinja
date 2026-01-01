@@ -1,0 +1,7 @@
+{%- if enable_debug -%}
+  {%- set debug_msg = "Debug: " ~ name ~ " &i18n:10007:wurde ausgeführt&" -%}
+  {{- debug_msg -}}
+{%- else -%}
+  {{- name ~ " &i18n:10008:wurde erfolgreich ausgeführt&" -}}
+{%- endif -%}
+

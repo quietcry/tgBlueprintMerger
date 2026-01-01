@@ -1,11 +1,13 @@
 blueprint:
-  name: My Example Blueprint
-  description: Ein Beispiel-Blueprint für tgBlueprintMerger
+  name: &i18n:10001:My Example Blueprint&
+  description: &i18n:10002:Ein Beispiel-Blueprint für tgBlueprintMerger&
   domain: automation
   input:
     #START-tgMerger=myBlueprintExample_input.yaml
     #END-tgMerger
-
+#Doc-Start
+#diese ist nur eine Doku die im Output herausgefiltert ist 
+#Doc-End auch das wird entfernt
 trigger:
   #START-tgMerger=myBlueprintExample_trigger.yaml
   #END-tgMerger

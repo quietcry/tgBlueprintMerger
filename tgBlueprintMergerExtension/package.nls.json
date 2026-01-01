@@ -1,0 +1,16 @@
+{
+  "command.title": "Save & Merge Home Assistant Blueprint",
+  "config.title": "tgBlueprintMerger",
+  "config.scriptPath.description": "Path to tgBlueprintMerger_yaml_jinja.sh script. Leave empty for automatic search. Can be absolute or relative to workspace root.",
+  "No active editor": "No active editor",
+  "Base file not found: {0}. Please ensure the base file exists in the same directory.": "Base file not found: {0}. Please ensure the base file exists in the same directory.",
+  "Configured script path not found: {0}. Please check your settings.": "Configured script path not found: {0}. Please check your settings.",
+  "Script {0} not found. Please ensure it is in the workspace root, configure the path in settings (tgBlueprintMerger.scriptPath), or place it in the same directory as your Blueprint files.": "Script {0} not found. Please ensure it is in the workspace root, configure the path in settings (tgBlueprintMerger.scriptPath), or place it in the same directory as your Blueprint files.",
+  "Merging Blueprint": "Merging Blueprint",
+  "Processing {0}...": "Processing {0}...",
+  "Merge failed: {0}": "Merge failed: {0}",
+  "Merge completed!": "Merge completed!",
+  "Home Assistant Blueprint merged successfully: {0}": "Home Assistant Blueprint merged successfully: {0}",
+  "$(merge) Merge": "$(merge) Merge",
+  "Save & Merge Home Assistant Blueprint": "Save & Merge Home Assistant Blueprint"
+}

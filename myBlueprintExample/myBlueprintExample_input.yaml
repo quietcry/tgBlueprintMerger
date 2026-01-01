@@ -1,0 +1,14 @@
+name:
+  name: &i18n:10003:Name&
+  description: &i18n:10004:Name der Automatisierung&
+  default: "Example Automation"
+  selector:
+    text:
+
+enable_debug:
+  name: &i18n:10005:Debug aktivieren&
+  description: &i18n:10006:Aktiviert Debug-Ausgaben&
+  default: false
+  selector:
+    boolean:
+

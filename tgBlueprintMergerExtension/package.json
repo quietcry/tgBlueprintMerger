@@ -18,7 +18,7 @@
     "commands": [
       {
         "command": "tgMerge.saveAndMerge",
-        "title": "Save & Merge Home Assistant Blueprint",
+        "title": "%command.title%",
         "icon": "$(merge)"
       }
     ],
@@ -46,12 +46,12 @@
       ]
     },
     "configuration": {
-      "title": "tgBlueprintMerger",
+      "title": "%config.title%",
       "properties": {
         "tgBlueprintMerger.scriptPath": {
           "type": "string",
           "default": "",
-          "description": "Pfad zum tgBlueprintMerger_yaml_jinja.sh Script. Leer lassen für automatische Suche. Kann absolut oder relativ zum Workspace-Root sein.",
+          "description": "%config.scriptPath.description%",
           "scope": "resource"
         }
       }

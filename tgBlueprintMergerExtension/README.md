@@ -1,39 +1,60 @@
 # tgMerge Blueprint Extension
 
-VS Code/Cursor Extension zum Ausführen des tgMerge-Scripts für Blueprint-Dateien.
+Minimale VS Code/Cursor Extension (Wrapper) zum Ausführen des tgBlueprintMerger-Scripts für Blueprint-Dateien.
 
 ## Features
 
 - **Save & Merge Button**: Button in der Editor-Toolbar für `*_*.yaml` Dateien
 - **Status Bar Button**: Schnellzugriff über die Statusleiste
-- **Command Palette**: Verfügbar über `Ctrl+Shift+P` → "Save & Merge Blueprint"
+- **Command Palette**: Verfügbar über `Ctrl+Shift+P` → "Save & Merge Home Assistant Blueprint"
 - **Automatisches Speichern**: Speichert die Datei vor dem Merge
+- **Minimale Größe**: Enthält nur den nötigen Code für Buttons und Script-Aufruf
 
 ## Installation
 
-1. Extension-Ordner in VS Code/Cursor öffnen:
+### Als VSIX-Datei installieren:
+
+1. VSIX-Datei erstellen:
    ```bash
-   # Vom Repository-Root aus:
-   code tgMergeExtension
-   
-   # Oder mit absolutem Pfad:
-   code /pfad/zu/tgBlueprintMerger/tgMergeExtension
+   cd /pfad/zu/tgBlueprintMerger
+   chmod +x create_vsix_minimal.sh
+   ./create_vsix_minimal.sh
    ```
 
 2. Extension installieren:
-   - `F5` drücken zum Debuggen/Testen
-   - Oder: `Ctrl+Shift+P` → "Extensions: Install from VSIX" (wenn als VSIX gepackt)
+   - Öffnen Sie VS Code/Cursor
+   - `Ctrl+Shift+P` (oder `Cmd+Shift+P` auf macOS)
+   - Wählen Sie "Extensions: Install from VSIX..."
+   - Wählen Sie die Datei: `tg-merge-blueprint-1.0.0.vsix`
+
+### Entwicklung/Testen:
+
+1. Extension-Ordner in VS Code/Cursor öffnen:
+   ```bash
+   code /pfad/zu/tgBlueprintMerger/tgBlueprintMergerExtension
+   ```
+
+2. `F5` drücken zum Debuggen/Testen
 
 ## Verwendung
 
-1. Öffne eine `*_*.yaml` Datei (z.B. `myBlueprint_.yaml`)
-2. Klicke auf den "Save & Merge Blueprint" Button in der Toolbar
-3. Oder verwende `Ctrl+Shift+P` → "Save & Merge Blueprint"
-4. Die Datei wird gespeichert und das Merge-Script wird ausgeführt
+1. **WICHTIG**: Das Script `tgBlueprintMerger_yaml_jinja.sh` muss im Workspace-Root liegen!
+2. Öffne eine `*_*.yaml` Datei (z.B. `myBlueprint_.yaml`)
+3. Klicke auf den "Save & Merge Home Assistant Blueprint" Button in der Toolbar
+4. Oder verwende `Ctrl+Shift+P` → "Save & Merge Home Assistant Blueprint"
+5. Die Datei wird gespeichert und das Merge-Script wird ausgeführt
+
+## Konfiguration
+
+Falls das Script nicht im Workspace-Root liegt, können Sie den Pfad in den Einstellungen konfigurieren:
+
+- `Ctrl+Shift+P` → "Preferences: Open Settings (UI)"
+- Suche nach "tgBlueprintMerger"
+- Setze `tgBlueprintMerger.scriptPath` auf den Pfad zum Script (absolut oder relativ zum Workspace-Root)
 
 ## Anforderungen
 
-- Das Script `tgMergeOnSave_yaml_jinja.sh` muss im übergeordneten Verzeichnis liegen
+- Das Script `tgBlueprintMerger_yaml_jinja.sh` muss im Workspace-Root liegen (oder konfiguriert werden)
 - Bash muss verfügbar sein
 
 

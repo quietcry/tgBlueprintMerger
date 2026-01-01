@@ -1,0 +1,47 @@
+blueprint:
+  name: Il Mio Blueprint di Esempio
+  description: Un blueprint di esempio per tgBlueprintMerger
+  domain: automation
+  input:
+    name:
+      name: Nome
+      description: Nome dell'automazione
+      default: "Example Automation"
+      selector:
+        text:
+    enable_debug:
+      name: Abilita debug
+      description: Abilita l'output di debug
+      default: false
+      selector:
+        boolean:
+
+trigger:
+  - platform: homeassistant
+    event: start
+  - platform: state
+    entity_id: sun.sun
+    to: "below_horizon"
+
+
+condition:
+  - condition: state
+    entity_id: sun.sun
+    state: "below_horizon"
+
+
+action:
+  - variables:
+      message: >-
+        {%- if enable_debug -%}
+          {%- set debug_msg = "Debug: " ~ name ~ " è stato eseguito" -%}
+          {{- debug_msg -}}
+        {%- else -%}
+          {{- name ~ " è stato eseguito con successo" -}}
+        {%- endif -%}
+
+  - service: notify.persistent_notification
+    data:
+      message: "{{ message }}"
+      title: "Blueprint Example"
+

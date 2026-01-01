@@ -1,0 +1,7 @@
+# Central i18n Database
+# Format: text_id: { lang: "translation" }
+# This file contains translations that can be reused across multiple projects
+
+# Example entry (commented out):
+# 10001: { de: "Mein Beispiel-Blueprint", en: "My Example Blueprint", it: "Il Mio Blueprint di Esempio" }
+
