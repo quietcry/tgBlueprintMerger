@@ -25,10 +25,21 @@ VSIX_NAME="tg-merge-blueprint-${VERSION}.vsix"
 # Zurück zum Root
 cd ..
 
-# Lösche alte VSIX-Dateien falls vorhanden
-if [ -f "tg-merge-blueprint-*.vsix" ]; then
-    rm -f tg-merge-blueprint-*.vsix
-    echo "✓ Alte VSIX-Datei(en) gelöscht"
+# Lösche alle alten VSIX-Dateien (außer der aktuellen, die wir gleich erstellen)
+OLD_VSIX_COUNT=0
+for old_vsix in tg-merge-blueprint-*.vsix; do
+    # Prüfe ob Datei existiert (Wildcard könnte nicht matchen)
+    if [ -f "$old_vsix" ]; then
+        # Lösche nur wenn es nicht die aktuelle Version ist
+        if [ "$old_vsix" != "$VSIX_NAME" ]; then
+            rm -f "$old_vsix"
+            OLD_VSIX_COUNT=$((OLD_VSIX_COUNT + 1))
+        fi
+    fi
+done
+
+if [ $OLD_VSIX_COUNT -gt 0 ]; then
+    echo "✓ $OLD_VSIX_COUNT alte VSIX-Datei(en) gelöscht"
 fi
 
 # Wechsle wieder ins Extension-Verzeichnis
