@@ -9,12 +9,6 @@ cd "$(dirname "$0")"
 echo "=== Erstelle minimale VSIX-Datei (Wrapper Extension) ==="
 echo ""
 
-# Lösche alte VSIX-Datei falls vorhanden
-if [ -f "tg-merge-blueprint-1.0.0.vsix" ]; then
-    rm -f tg-merge-blueprint-1.0.0.vsix
-    echo "✓ Alte VSIX-Datei gelöscht"
-fi
-
 # Wechsle ins Extension-Verzeichnis
 cd tgBlueprintMergerExtension
 
@@ -23,6 +17,22 @@ if [ ! -f "package.json" ]; then
     echo "✗ FEHLER: package.json nicht gefunden!"
     exit 1
 fi
+
+# Lese Version aus package.json
+VERSION=$(grep -o '"version": "[^"]*"' package.json | cut -d'"' -f4)
+VSIX_NAME="tg-merge-blueprint-${VERSION}.vsix"
+
+# Zurück zum Root
+cd ..
+
+# Lösche alte VSIX-Dateien falls vorhanden
+if [ -f "tg-merge-blueprint-*.vsix" ]; then
+    rm -f tg-merge-blueprint-*.vsix
+    echo "✓ Alte VSIX-Datei(en) gelöscht"
+fi
+
+# Wechsle wieder ins Extension-Verzeichnis
+cd tgBlueprintMergerExtension
 
 # Prüfe ob extension.js existiert
 if [ ! -f "extension.js" ]; then
@@ -53,7 +63,7 @@ ORIG_DIR=$(pwd)
 
 # Erstelle ZIP-Datei aus dem temporären Verzeichnis
 cd "$TEMP_DIR"
-zip -r "$ORIG_DIR/../tg-merge-blueprint-1.0.0.vsix" extension/
+zip -r "$ORIG_DIR/../${VSIX_NAME}" extension/
 cd "$ORIG_DIR"
 
 # Aufräumen
@@ -63,21 +73,21 @@ rm -rf "$TEMP_DIR"
 cd ..
 
 # Prüfe ob VSIX-Datei erstellt wurde
-if [ -f "tg-merge-blueprint-1.0.0.vsix" ]; then
+if [ -f "${VSIX_NAME}" ]; then
     echo ""
-    echo "✓ VSIX-Datei erfolgreich erstellt: tg-merge-blueprint-1.0.0.vsix"
+    echo "✓ VSIX-Datei erfolgreich erstellt: ${VSIX_NAME}"
     
     # Zeige ZIP-Inhalt
     echo ""
     echo "VSIX-Inhalt:"
-    unzip -l tg-merge-blueprint-1.0.0.vsix
+    unzip -l "${VSIX_NAME}"
     
     echo ""
     echo "Installation in VS Code/Cursor:"
     echo "  1. Öffnen Sie VS Code/Cursor"
     echo "  2. Drücken Sie Ctrl+Shift+P (oder Cmd+Shift+P auf macOS)"
     echo "  3. Wählen Sie 'Extensions: Install from VSIX...'"
-    echo "  4. Wählen Sie die Datei: tg-merge-blueprint-1.0.0.vsix"
+    echo "  4. Wählen Sie die Datei: ${VSIX_NAME}"
     echo ""
     echo "WICHTIG: Das Script tgBlueprintMerger_yaml_jinja.sh muss im Workspace-Root liegen!"
     echo ""

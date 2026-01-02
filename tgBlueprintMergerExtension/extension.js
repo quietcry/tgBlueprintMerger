@@ -102,12 +102,11 @@ function activate(context) {
                 }
             }
             
-            if (!scriptPath) {
-                vscode.window.showErrorMessage(
-                    l10n.t('Script {0} not found. Please ensure it is in the workspace root, configure the path in settings (tgBlueprintMerger.scriptPath), or place it in the same directory as your Blueprint files.', scriptName)
-                );
-                return;
-            }
+        if (!scriptPath) {
+            vscode.window.showErrorMessage(
+                l10n.t('Script {0} not found. Please ensure it is in the workspace root, configure the path in settings (tgBlueprintMerger.scriptPath), or place it in the same directory as your Blueprint files.', scriptName)
+            );
+            return;
         }
         
         // Show progress

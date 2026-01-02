@@ -2,7 +2,7 @@
   "name": "tg-merge-blueprint",
   "displayName": "tgBlueprintMerger - Home Assistant Blueprint Merger",
   "description": "Save and merge Home Assistant Blueprint files using tgBlueprintMerger. Enables modular development of complex Home Assistant automations by splitting blueprints into reusable components.",
-  "version": "1.0.0",
+  "version": "2026.01.006",
   "publisher": "tg",
   "engines": {
     "vscode": "^1.80.0"

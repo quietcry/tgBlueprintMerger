@@ -22,14 +22,18 @@ Thumbs.db
 # Build artifacts
 *.vsix
 
+# i18n central database (auto-generated)
+i18n_central_db.yaml
+
 # Example output files (keep input files)
-myBlueprintExample/*.yaml
+myBlueprintExample/*.*
+myBlueprintExample/missing_text-id.txt
+myBlueprintExample/tmp_*
 !myBlueprintExample/*_.yaml
 !myBlueprintExample/*_*.yaml
 !myBlueprintExample/*.package
 !myBlueprintExample/*.jinja
-myBlueprintExample/missing_text-id.txt
-myBlueprintExample/tmp_*
+!myBlueprintExample/translations/
 
 # Temporary extension build directory
 temp_extension/
@@ -37,10 +41,14 @@ temp_extension/
 # Test scripts (optional, can be kept for development)
 tests/
 
-# Local publishing guide (not for repository)
-PUBLISH.md
-PUBLICATION_STEPS.md
-publish.sh
-publish_to_repos.sh
-setup_repo.sh
-INSTALL_EXTENSION.md
+# Markdown files (ignore all except README files)
+*.md
+!README*.md
+
+# Local publishing scripts (not for repository)
+*.sh
+!create_vsix_minimal.sh
+!build_extension.sh
+!bump_version.sh
+!version_and_build.sh
+

@@ -409,9 +409,15 @@ if [ -f "$BASEDIR/$PACKAGE.package" ]; then
         
         # Create central DB if it doesn't exist
         if [ ! -f "$CENTRAL_DB_FILE" ]; then
-            touch "$CENTRAL_DB_FILE"
-            echo "# Central i18n Database" >> "$CENTRAL_DB_FILE"
-            echo "# Format: text_id: { lang: \"translation\" }" >> "$CENTRAL_DB_FILE"
+            cat > "$CENTRAL_DB_FILE" << 'EOF'
+# Central i18n Database
+# Format: text_id: { lang: "translation" }
+# This file contains translations that can be reused across multiple projects
+
+# Example entry (commented out):
+# 10001: { de: "Mein Beispiel-Blueprint", en: "My Example Blueprint", it: "Il Mio Blueprint di Esempio" }
+
+EOF
         fi
         
         # Create a copy of the merged file with i18n markers for processing
