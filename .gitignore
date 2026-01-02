@@ -53,5 +53,5 @@ tests/
 !version_and_build.sh
 
 # Project configuration (local, not in repository)
-project.ini
+project.json
 

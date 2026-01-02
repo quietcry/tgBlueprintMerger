@@ -23,16 +23,16 @@
 #   automatisch aus, wenn package.json geändert wurde.
 #
 # Zentrale Scripts (optional):
-#   Das Script liest die Konfiguration aus project.ini:
-#   1. Erstellen Sie project.ini basierend auf project.ini.example
-#   2. Setzen Sie githook_scripts_dir in der [versioning] Sektion
+#   Das Script liest die Konfiguration aus project.json:
+#   1. Erstellen Sie project.json basierend auf project.json.example
+#   2. Setzen Sie githook_scripts_dir in der versioning Sektion
 #   3. Fallback: Umgebungsvariable GITHOOK_SCRIPTS_DIR
 #   4. Fallback: Lokale Implementierung wird verwendet
 #
 # Für andere Projekte:
-#   Kopieren Sie project.ini.example nach project.ini und passen Sie an:
-#   cp project.ini.example project.ini
-#   # Bearbeiten Sie project.ini und setzen Sie githook_scripts_dir
+#   Kopieren Sie project.json.example nach project.json und passen Sie an:
+#   cp project.json.example project.json
+#   # Bearbeiten Sie project.json und setzen Sie githook_scripts_dir
 #
 # ============================================================================
 
@@ -49,16 +49,22 @@ if [ ! -f "$PACKAGE_JSON" ]; then
     exit 1
 fi
 
-# Suche zentrales Script über project.ini Konfiguration
+# Suche zentrales Script über project.json Konfiguration
 CENTRAL_SCRIPT=""
-PROJECT_INI="project.ini"
+PROJECT_JSON="project.json"
 
-# Lese Konfiguration aus project.ini (falls vorhanden)
-if [ -f "$PROJECT_INI" ]; then
-    # Extrahiere githook_scripts_dir aus project.ini (ignoriere Kommentare und leere Zeilen)
-    GITHOOK_SCRIPTS_DIR=$(grep -E "^[[:space:]]*githook_scripts_dir[[:space:]]*=" "$PROJECT_INI" | grep -v "^[[:space:]]*#" | cut -d'=' -f2 | tr -d '[:space:]' | sed "s/^['\"]//;s/['\"]$//")
+# Lese Konfiguration aus project.json (falls vorhanden)
+if [ -f "$PROJECT_JSON" ]; then
+    # Extrahiere githook_scripts_dir aus project.json
+    if command -v jq >/dev/null 2>&1; then
+        # Verwende jq falls verfügbar (präziser)
+        GITHOOK_SCRIPTS_DIR=$(jq -r '.versioning.githook_scripts_dir // empty' "$PROJECT_JSON" 2>/dev/null)
+    else
+        # Fallback: Einfaches Parsing mit grep/sed
+        GITHOOK_SCRIPTS_DIR=$(grep -o '"githook_scripts_dir"[[:space:]]*:[[:space:]]*"[^"]*"' "$PROJECT_JSON" | sed 's/.*"githook_scripts_dir"[[:space:]]*:[[:space:]]*"\([^"]*\)".*/\1/')
+    fi
     
-    if [ -n "$GITHOOK_SCRIPTS_DIR" ] && [ -f "$GITHOOK_SCRIPTS_DIR/version_and_build.sh" ]; then
+    if [ -n "$GITHOOK_SCRIPTS_DIR" ] && [ "$GITHOOK_SCRIPTS_DIR" != "null" ] && [ -f "$GITHOOK_SCRIPTS_DIR/version_and_build.sh" ]; then
         CENTRAL_SCRIPT="$GITHOOK_SCRIPTS_DIR/version_and_build.sh"
     fi
 fi
