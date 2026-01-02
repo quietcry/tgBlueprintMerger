@@ -17,15 +17,16 @@
 #   4. Gibt die neue Version aus
 #
 # Zentrale Scripts (optional):
-#   Das Script sucht automatisch nach zentralen Scripts in:
-#   1. Umgebungsvariable GITHOOK_SCRIPTS_DIR
-#   2. Übergeordneten Verzeichnissen (../githook_scripts/, ../../githook_scripts/, etc.)
-#   3. Fallback: Lokale Implementierung wird verwendet
+#   Das Script liest die Konfiguration aus project.ini:
+#   1. Erstellen Sie project.ini basierend auf project.ini.example
+#   2. Setzen Sie githook_scripts_dir in der [versioning] Sektion
+#   3. Fallback: Umgebungsvariable GITHOOK_SCRIPTS_DIR
+#   4. Fallback: Lokale Implementierung wird verwendet
 #
 # Für andere Projekte:
-#   Setzen Sie die Umgebungsvariable:
-#   export GITHOOK_SCRIPTS_DIR="/pfad/zu/githook_scripts"
-#   Oder platzieren Sie die Scripts in einem übergeordneten Verzeichnis
+#   Kopieren Sie project.ini.example nach project.ini und passen Sie an:
+#   cp project.ini.example project.ini
+#   # Bearbeiten Sie project.ini und setzen Sie githook_scripts_dir
 #
 # ============================================================================
 
@@ -41,32 +42,23 @@ if [ ! -f "$PACKAGE_JSON" ]; then
     exit 1
 fi
 
-# Suche zentrales Script (ohne absolute Pfade preiszugeben)
+# Suche zentrales Script über project.ini Konfiguration
 CENTRAL_SCRIPT=""
+PROJECT_INI="project.ini"
 
-# Methode 1: Umgebungsvariable
-if [ -n "$GITHOOK_SCRIPTS_DIR" ] && [ -f "$GITHOOK_SCRIPTS_DIR/bump_version.sh" ]; then
-    CENTRAL_SCRIPT="$GITHOOK_SCRIPTS_DIR/bump_version.sh"
+# Lese Konfiguration aus project.ini (falls vorhanden)
+if [ -f "$PROJECT_INI" ]; then
+    # Extrahiere githook_scripts_dir aus project.ini (ignoriere Kommentare und leere Zeilen)
+    GITHOOK_SCRIPTS_DIR=$(grep -E "^[[:space:]]*githook_scripts_dir[[:space:]]*=" "$PROJECT_INI" | grep -v "^[[:space:]]*#" | cut -d'=' -f2 | tr -d '[:space:]' | sed "s/^['\"]//;s/['\"]$//")
+    
+    if [ -n "$GITHOOK_SCRIPTS_DIR" ] && [ -f "$GITHOOK_SCRIPTS_DIR/bump_version.sh" ]; then
+        CENTRAL_SCRIPT="$GITHOOK_SCRIPTS_DIR/bump_version.sh"
+    fi
 fi
 
-# Methode 2: Suche in typischen Verzeichnissen relativ zum Projekt
-if [ -z "$CENTRAL_SCRIPT" ]; then
-    # Suche in übergeordneten Verzeichnissen nach githook_scripts
-    CURRENT_DIR="$(pwd)"
-    for i in 1 2 3 4 5; do
-        TEST_PATH=""
-        case $i in
-            1) TEST_PATH="../githook_scripts/bump_version.sh" ;;
-            2) TEST_PATH="../../githook_scripts/bump_version.sh" ;;
-            3) TEST_PATH="../../../githook_scripts/bump_version.sh" ;;
-            4) TEST_PATH="../../../../githook_scripts/bump_version.sh" ;;
-            5) TEST_PATH="../../../../../githook_scripts/bump_version.sh" ;;
-        esac
-        if [ -f "$TEST_PATH" ]; then
-            CENTRAL_SCRIPT="$TEST_PATH"
-            break
-        fi
-    done
+# Fallback: Umgebungsvariable
+if [ -z "$CENTRAL_SCRIPT" ] && [ -n "$GITHOOK_SCRIPTS_DIR" ] && [ -f "$GITHOOK_SCRIPTS_DIR/bump_version.sh" ]; then
+    CENTRAL_SCRIPT="$GITHOOK_SCRIPTS_DIR/bump_version.sh"
 fi
 
 # Methode 3: Lokale Implementierung (Fallback)
