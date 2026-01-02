@@ -25,16 +25,13 @@ VSIX_NAME="tg-merge-blueprint-${VERSION}.vsix"
 # Zurück zum Root
 cd ..
 
-# Lösche alle alten VSIX-Dateien (außer der aktuellen, die wir gleich erstellen)
+# Lösche alle alten VSIX-Dateien (inklusive der aktuellen Version, falls vorhanden)
 OLD_VSIX_COUNT=0
 for old_vsix in tg-merge-blueprint-*.vsix; do
     # Prüfe ob Datei existiert (Wildcard könnte nicht matchen)
     if [ -f "$old_vsix" ]; then
-        # Lösche nur wenn es nicht die aktuelle Version ist
-        if [ "$old_vsix" != "$VSIX_NAME" ]; then
-            rm -f "$old_vsix"
-            OLD_VSIX_COUNT=$((OLD_VSIX_COUNT + 1))
-        fi
+        rm -f "$old_vsix"
+        OLD_VSIX_COUNT=$((OLD_VSIX_COUNT + 1))
     fi
 done
 
@@ -57,28 +54,67 @@ echo ""
 echo "Erstelle VSIX-Datei (nur minimale Dateien)..."
 echo "HINWEIS: Das Script tgBlueprintMerger_yaml_jinja.sh muss im Workspace liegen!"
 
-# Erstelle temporäres Verzeichnis mit extension/ Unterordner
-# (Cursor erwartet möglicherweise diese Struktur)
-TEMP_DIR=$(mktemp -d)
-mkdir -p "$TEMP_DIR/extension"
-
-# Kopiere Dateien in extension/ Unterordner
-cp package.json "$TEMP_DIR/extension/"
-cp extension.js "$TEMP_DIR/extension/"
-if [ -f README.md ]; then
-    cp README.md "$TEMP_DIR/extension/"
-fi
-
 # Speichere aktuelles Verzeichnis (ist bereits tgBlueprintMergerExtension)
 ORIG_DIR=$(pwd)
+VSIX_PATH="$ORIG_DIR/../${VSIX_NAME}"
 
-# Erstelle ZIP-Datei aus dem temporären Verzeichnis
-cd "$TEMP_DIR"
-zip -r "$ORIG_DIR/../${VSIX_NAME}" extension/
-cd "$ORIG_DIR"
+# Erstelle VSIX mit Python für präzise ZIP-Struktur
+# Dateien müssen in extension/ Unterordner liegen
+python3 << PYTHON_SCRIPT
+import zipfile
+import os
+import shutil
+from pathlib import Path
+
+# Temporäres Verzeichnis
+temp_dir = Path("/tmp/vsix_create")
+temp_ext_dir = temp_dir / "extension"
+
+# Alte VSIX löschen
+if os.path.exists("${VSIX_PATH}"):
+    os.remove("${VSIX_PATH}")
+
+# Temporäres Verzeichnis erstellen
+if temp_dir.exists():
+    shutil.rmtree(temp_dir)
+temp_ext_dir.mkdir(parents=True)
+
+# Dateien in extension/ Unterordner kopieren
+shutil.copy("package.json", temp_ext_dir / "package.json")
+shutil.copy("extension.js", temp_ext_dir / "extension.js")
+if os.path.exists("README.md"):
+    shutil.copy("README.md", temp_ext_dir / "README.md")
+
+# ZIP erstellen - Dateien in extension/ Unterordner
+with zipfile.ZipFile("${VSIX_PATH}", 'w', zipfile.ZIP_DEFLATED) as zipf:
+    for root, dirs, files in os.walk(temp_ext_dir):
+        for file in files:
+            file_path = Path(root) / file
+            # Relativer Pfad: extension/package.json
+            arcname = file_path.relative_to(temp_ext_dir.parent)
+            zipf.write(file_path, arcname)
 
 # Aufräumen
-rm -rf "$TEMP_DIR"
+shutil.rmtree(temp_dir)
+PYTHON_SCRIPT
+
+if [ $? -ne 0 ]; then
+    echo "✗ FEHLER: Python-Script fehlgeschlagen, verwende Fallback mit zip"
+    # Fallback: Verwende zip - Dateien in extension/ Unterordner
+    TEMP_DIR=$(mktemp -d)
+    EXT_DIR="$TEMP_DIR/extension"
+    mkdir -p "$EXT_DIR"
+    cp package.json "$EXT_DIR/"
+    cp extension.js "$EXT_DIR/"
+    if [ -f README.md ]; then
+        cp README.md "$EXT_DIR/"
+    fi
+    cd "$TEMP_DIR"
+    # Dateien in extension/ Unterordner
+    zip -r "$VSIX_PATH" extension/
+    cd "$ORIG_DIR"
+    rm -rf "$TEMP_DIR"
+fi
 
 # Zurück zum ursprünglichen Verzeichnis (Repository-Root)
 cd ..

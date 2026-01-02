@@ -1,6 +1,6 @@
 {
   "versioning": {
-    "githook_scripts_dir": "/tgdata/coding/githook_scripts",
+    "githook_scripts_dir": "/githook_scripts",
     "comment": "Pfad zu den zentralen Versionsverwaltungs-Scripts (optional). Lassen Sie leer oder entfernen Sie diese Zeile, um lokale Implementierung zu verwenden. Alternative: Relativer Pfad wie '../githook_scripts'"
   }
 }
